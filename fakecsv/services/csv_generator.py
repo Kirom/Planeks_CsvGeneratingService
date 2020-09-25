@@ -62,16 +62,16 @@ class CsvWriter:
         self.fieldnames = []
         self.file_name = file_name
         self.columns = columns
-        self.file = open(file_name, 'w')
+        # self.file = open(self.file_name, 'w')
         self.rows = rows
 
-    def get_init_vals(self):
+    def get_init_vals(self, file):
         """Initialize fieldnames, separator, quote"""
         for column in self.columns:
             self.fieldnames.insert(column.order, column.name)
             separator = column.data_schema.column_separator
             quote = column.data_schema.string_character
-        self.writer = csv.DictWriter(self.file,
+        self.writer = csv.DictWriter(file,
                                      fieldnames=self.fieldnames,
                                      delimiter=separator,
                                      quotechar=quote)
@@ -106,6 +106,7 @@ class CsvWriter:
             self.writer.writerow(row)
 
     def run(self):
-        self.get_init_vals()
-        self.write_rows()
-        self.file.close()
+        with open(self.file_name, 'w') as csv_file:
+            self.get_init_vals(csv_file)
+            self.write_rows()
+        # self.file.close()
