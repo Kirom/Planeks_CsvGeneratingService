@@ -26,11 +26,8 @@ class Column(models.Model):
         FULL_NAME = 'FN', 'Full name'
         JOB = 'JOB', 'Job'
         EMAIL = 'EMAIL', 'Email'
-        DOMAIN = 'DOMAIN', 'Domain'
-        PHONE_NUMBER = 'PN', 'Phone number'
         COMPANY_NAME = 'CN', 'Company name'
         INTEGER = 'INT', 'Integer'
-        ADDRESS = 'ADDR', 'Address'
         DATE = 'DATE', 'Date'
 
     name = models.CharField(max_length=100, verbose_name='Name')
