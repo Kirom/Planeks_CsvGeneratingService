@@ -4,6 +4,9 @@ import os
 import sys
 
 if __name__ == "__main__":
+    import configurations
+
+    configurations.setup()
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Planeks_CsvGeneratingService.settings")
     os.environ.setdefault("DJANGO_CONFIGURATION", "LocalConf")
     try:
