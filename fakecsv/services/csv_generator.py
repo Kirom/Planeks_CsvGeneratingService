@@ -109,4 +109,4 @@ class CsvWriter:
         with open(self.file_name, 'w') as csv_file:
             self.get_init_vals(csv_file)
             self.write_rows()
-        # self.file.close()
+

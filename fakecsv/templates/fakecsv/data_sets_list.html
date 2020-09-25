@@ -41,7 +41,7 @@
                         <td>
                             {% ifequal obj.status 'Ready' %}
                                 <a href="{% url 'fakecsv:download_csv' obj.data_schema.id obj.id %}">
-                                    <button class="btn btn-primary">Download {{ obj.id }}</button>
+                                    <button class="btn btn-primary">Download</button>
                                 </a>
                             {% endifequal %}
                         </td>
