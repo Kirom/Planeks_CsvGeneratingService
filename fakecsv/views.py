@@ -49,8 +49,7 @@ def generate_csv(request, pk=None):
     new_data_set = DataSet.objects.create(created=timezone.now(),
                                           status='Processing',
                                           data_schema=data_schema)
-    csv_file = os.path.join(BASE_DIR, 'fakecsv', 'media', 'fakecsv',
-                            f'{data_schema}_{new_data_set.id}.csv')
+    csv_file = os.path.join(BASE_DIR, 'media', f'{data_schema}_{new_data_set.id}.csv')
     columns = Column.objects.select_related().filter(data_schema__name=data_schema)
     csv_writer = CsvWriter(csv_file, columns, rows)
     csv_writer.run()
@@ -59,8 +58,7 @@ def generate_csv(request, pk=None):
 
 def download_csv(request, pk=None, id=None):
     data_schema = DataSchema.objects.filter(id=pk).first()
-    csv_file = os.path.join(BASE_DIR, 'fakecsv', 'media', 'fakecsv',
-                            f'{data_schema}_{id}.csv')
+    csv_file = os.path.join(BASE_DIR, 'media', f'{data_schema}_{id}.csv')
 
     response = FileResponse(open(csv_file, 'rb'))
     return response
