@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block css %}
+<link href="{% static 'accounts/css/style.css' %}" rel="stylesheet"/>{% endblock %}
+{% block title %} Страница входа {% endblock %}
+{% block content %}
+<h1 class="display-4">Войти в систему</h1>
+<div class="container">
+    <div class="row mx-auto">
+        <div class="col-4">
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}">
+
+                {{ form|crispy }}
+
+                <button type="submit" class="btn btn-primary btn-block">Войти</button>
+            </form>
+        </div>
+    </div>
+    <div class="row mx-auto reset_forgot_block">
+        <div class="col-2">
+            <a href="{% url 'accounts:password_reset' %}">
+                <button class="btn btn-dark">Забыли пароль?</button>
+            </a></div>
+        <div class="col-2 right-side">
+            <a href="{% url 'accounts:registration' %}">
+                <button class="btn btn-info">Регистрация</button>
+            </a></div>
+    </div>
+</div>
+{% endblock %}

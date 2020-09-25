@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-2">
+            <h2 class="">Data sets
+
+            </h2>
+        </div>
+
+        <div class="col-md-5">
+            {% crispy form %}
+            {{ form.errors }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-7">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Created</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for obj in object_list %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{ obj.created|date:"Y-m-d" }}</td>
+                        <td>
+                            {% ifequal obj.status 'Processing' %}
+                                <button class="btn btn-secondary">{{ obj.status }}</button>
+                            {% else %}
+                                <button class="btn btn-success">{{ obj.status }}</button>
+                            {% endifequal %}
+                        </td>
+                        <td>
+                            {% ifequal obj.status 'Ready' %}
+                                <a href="{% url 'fakecsv:download_csv' obj.data_schema.id obj.id %}">
+                                    <button class="btn btn-primary">Download {{ obj.id }}</button>
+                                </a>
+                            {% endifequal %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+{#{% block javascript %}#}
+{#    <script type="text/javascript"#}
+{#            src="{% static 'fakecsv/js/js.js' %}"></script>{% endblock %}#}

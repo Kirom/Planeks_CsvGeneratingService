@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="col-md-7">
+        <h2 class="">Data schemas
+            <a href="{% url 'fakecsv:create' %}">
+                <button class="btn btn-success float-right">New schema</button>
+            </a>
+        </h2>
+
+
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Title</th>
+                <th scope="col">Modified</th>
+                <th scope="col">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for obj in object_list %}
+                <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td><a href="{% url 'fakecsv:data_sets_list' obj.pk %}">{{ obj.name }}</a></td>
+                    <td>{{ obj.modified }}</td>
+                    <td>
+                        <a href="{% url 'fakecsv:update_data_schema' obj.pk %}">
+                            <button class="btn btn-primary">Edit scheme</button>
+                        </a>
+                        &ensp;&ensp;&ensp;
+                        <a href="{% url 'fakecsv:delete_data_schema' obj.pk %}">
+                            <button class="btn btn-danger">Delete</button>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
