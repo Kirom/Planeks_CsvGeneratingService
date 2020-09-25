@@ -19,6 +19,7 @@ kombu==5.0.2
 mccabe==0.6.1
 prompt-toolkit==3.0.7
 psycopg2==2.8.6
+psycopg2-binary==2.8.6
 pycodestyle==2.6.0
 pyflakes==2.2.0
 pytz==2020.1
