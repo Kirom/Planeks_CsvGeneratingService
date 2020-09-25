@@ -9,8 +9,11 @@ from celery.schedules import crontab
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Planeks_CsvGeneratingService.settings")
 os.environ.setdefault("DJANGO_CONFIGURATION", "LocalConf")
 import configurations  # noqa
+from configurations import importer
 
 configurations.setup()
+
+importer.install()
 
 app = Celery("Planeks_CsvGeneratingService")
 app.config_from_object("django.conf:settings")
