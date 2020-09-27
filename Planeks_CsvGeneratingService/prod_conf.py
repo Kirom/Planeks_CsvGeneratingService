@@ -18,7 +18,7 @@ class ProdConf(BaseConf):
 
     SECRET_KEY = os.environ.get("SECRET_KEY")
 
-    DEBUG = False
+    DEBUG = True
 
     ALLOWED_HOSTS = ["fakecsv.herokuapp.com"]
 
