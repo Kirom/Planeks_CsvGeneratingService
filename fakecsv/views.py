@@ -13,7 +13,8 @@ from django_celery_results.models import TaskResult
 
 from fakecsv.services.csv_generator import CsvWriter
 from fakecsv.tasks import generate_csv_task
-from Planeks_CsvGeneratingService.settings import BASE_DIR, MEDIA_ROOT
+from Planeks_CsvGeneratingService.settings import BASE_DIR, MEDIA_ROOT, S3_BUCKET, AWS_ACCESS_KEY_ID, \
+    AWS_SECRET_ACCESS_KEY
 from fakecsv.forms import DataSchemaForm, ColumnFormSet, DataSetForm
 from fakecsv.models import DataSchema, DataSet, Column
 
@@ -70,9 +71,11 @@ def check_task_status(request, task_id):
 def download_csv(request, pk=None, id=None):
     data_schema = DataSchema.objects.filter(id=pk).first()
     csv_file = os.path.join(MEDIA_ROOT, f'{data_schema}_{id}.csv')
-    s3_client = boto3.client('s3')
+    s3_client = boto3.client(aws_access_key_id=AWS_ACCESS_KEY_ID,
+                             aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+                             service_name='s3')
     downloaded_csv = f'{data_schema}_{id}.csv'
-    s3_client.download_file('fakecsv', csv_file, downloaded_csv)
+    s3_client.download_file(S3_BUCKET, csv_file, downloaded_csv)
 
     response = FileResponse(open(csv_file, 'rb'))
     return response

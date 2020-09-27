@@ -44,3 +44,6 @@ class ProdConf(BaseConf):
     REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD")
     CELERY_BROKER_URL = os.environ.get("BROKER_URL")
     CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND")
+    AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+    S3_BUCKET = os.environ.get("S3_BUCKET")
