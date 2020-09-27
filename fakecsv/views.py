@@ -45,7 +45,6 @@ def generate_csv(request, pk=None):
         if form.is_valid():
             data = form.cleaned_data
             rows = data['rows']
-            print(rows)
     else:
         messages.error(request, message='Please input rows quantity')
         form = DataSetForm()

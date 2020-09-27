@@ -114,7 +114,7 @@ class CsvWriter:
         with open(self.file_name, 'w') as csv_file:
             self.get_init_vals(csv_file)
             self.write_rows()
-            print(csv_file)
+            print('Processing file')
             # s3_client = boto3.client(aws_access_key_id=AWS_ACCESS_KEY_ID,
             #                          aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
             #                          service_name='s3')
