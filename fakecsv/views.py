@@ -75,7 +75,7 @@ def download_csv(request, pk=None, id=None):
                              aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
                              service_name='s3')
     downloaded_csv = f'{data_schema}_{id}.csv'
-    s3_client.download_file(S3_BUCKET, csv_file, downloaded_csv)
+    s3_client.download_file(S3_BUCKET_NAME, csv_file, downloaded_csv)
 
     response = FileResponse(open(csv_file, 'rb'))
     return response
