@@ -62,7 +62,6 @@ class CsvWriter:
         self.fieldnames = []
         self.file_name = file_name
         self.columns = columns
-        # self.file = open(self.file_name, 'w')
         self.rows = rows
 
     def get_init_vals(self, file):

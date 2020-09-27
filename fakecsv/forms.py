@@ -8,49 +8,6 @@ from crispy_forms.layout import Layout, Field, Fieldset, Div, HTML, ButtonHolder
 from fakecsv.services.custom_layout_object import *
 
 
-# class DataSchemaForm(forms.ModelForm):
-#     # query_set = DataSchema.objects.all()
-#     # column_separator_qs = DataSchema.objects.all().column_separator
-#     # name = forms.CharField(label='Name',
-#     #                        widget=forms.TextInput(
-#     #                            attrs={'class': 'form-control form-control-sm'}))
-#
-#     # column_separator = forms.ChoiceField(label='Column separator',
-#     #                                      widget=forms.Select(
-#     #                                          attrs={'class': 'form-control js-example-basic-single'}))
-#
-#     # string_character = forms.ChoiceField(label='String character',
-#     #                                      widget=forms.Select(
-#     #                                          attrs={'class': 'form-control js-example-basic-single'}))
-#
-#     # travel_time = forms.CharField(label='Время в пути',
-#     #                               widget=forms.NumberInput(
-#     #                                   attrs={'class': 'form-control form-control-sm', 'placeholder': 'Часов'}))
-#
-#     class Meta:
-#         model = DataSchema
-#         fields = ('name', 'column_separator', 'string_character',)
-#
-#     def __init__(self, *args, **kwargs):
-#         super(DataSchemaForm, self).__init__(*args, **kwargs)
-#         for visible in self.visible_fields():
-#             visible.field.widget.attrs['class'] = 'form-control form-control-sm'
-
-
-# class ColumnForm(forms.ModelForm):
-#     # query_set = DataSchema.objects.all()
-#     # column_separator_qs = DataSchema.objects.all().column_separator
-#     # name = forms.CharField(label='Name',
-#     #                        widget=forms.TextInput(
-#     #                            attrs={'class': 'form-control form-control-sm'}))
-#     class Meta:
-#         model = Column
-#         fields = ('name', 'data_type', 'range_from', 'range_to', 'order')
-#
-#     def __init__(self, *args, **kwargs):
-#         super(ColumnForm, self).__init__(*args, **kwargs)
-#         for visible in self.visible_fields():
-#             visible.field.widget.attrs['class'] = 'form-control form-control-sm'
 class ColumnForm(forms.ModelForm):
     class Meta:
         model = Column
@@ -83,7 +40,7 @@ class DataSchemaForm(forms.ModelForm):
                 Fieldset('Schema columns',
                          Formset('columns')),
                 HTML("<br>"),
-                ButtonHolder(Submit('submit', 'Save')),
+                ButtonHolder(Submit('submit', 'Submit')),
             )
         )
 
@@ -99,5 +56,4 @@ class DataSetForm(forms.Form):
             Field('rows'),
             ButtonHolder(Submit('submit', 'Generate data', css_class='btn btn-success')),
         )
-        # self.helper.form_method = 'post'
         self.helper.form_action = 'generate_csv/'

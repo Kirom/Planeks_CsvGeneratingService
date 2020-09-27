@@ -8,34 +8,33 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.generic import ListView
 from django.views.generic.edit import DeleteView, CreateView, UpdateView
-
+from django_celery_results.models import TaskResult
+from fakecsv.tasks import generate_csv_task
 from Planeks_CsvGeneratingService.settings import BASE_DIR, MEDIA_ROOT
 from fakecsv.forms import DataSchemaForm, ColumnFormSet, DataSetForm
-from fakecsv.models import Column, DataSchema, DataSet
+from fakecsv.models import DataSchema, DataSet
 
-from fakecsv.services.csv_generator import CsvWriter
 import os
 from django.http import JsonResponse
 
 
-# Рабочий вариант с JS
+# Неоконченный вариант с JS
 # def generate_csv(request, pk=None):
-#     # form = DataSetForm(request.GET)
-#     # print(form.cleaned_data)
-#     data_schema = DataSchema.objects.filter(id=pk).first()
-#     new_data_set = DataSet.objects.create(created=timezone.now(),
-#                                           status='Processing',
-#                                           data_schema=data_schema)
-#     csv_file = os.path.join(BASE_DIR, 'fakecsv', 'media', 'fakecsv',
-#                             f'{data_schema}_{new_data_set.id}.csv')
-#     columns = Column.objects.select_related().filter(data_schema__name=data_schema)
-#     csv_writer = CsvWriter(csv_file, columns)
-#     csv_writer.run()
-#     data = {'id': new_data_set.id, 'created': new_data_set.created}
+#     if request.method == 'POST':
+#         form = DataSetForm(request.POST or None)
+#         if form.is_valid():
+#             data = form.cleaned_data
+#             rows = data['rows']
+#     else:
+#         messages.error(request, message='Please input rows quantity')
+#         form = DataSetForm()
+#     task = generate_csv_task.delay(rows, pk)
+#     data = {'task_id': task.task_id, }
 #     response = JsonResponse(data)
-#     return response
+#     return redirect('fakecsv:data_sets_list', pk=pk,)
 
 
+# Рабочий вариант базовый без js
 def generate_csv(request, pk=None):
     if request.method == 'POST':
         form = DataSetForm(request.POST or None)
@@ -45,15 +44,15 @@ def generate_csv(request, pk=None):
     else:
         messages.error(request, message='Please input rows quantity')
         form = DataSetForm()
-    data_schema = DataSchema.objects.filter(id=pk).first()
-    new_data_set = DataSet.objects.create(created=timezone.now(),
-                                          status='Processing',
-                                          data_schema=data_schema)
-    csv_file = os.path.join(MEDIA_ROOT, f'{data_schema}_{new_data_set.id}.csv')
-    columns = Column.objects.select_related().filter(data_schema__name=data_schema)
-    csv_writer = CsvWriter(csv_file, columns, rows)
-    csv_writer.run()
+    generate_csv_task.delay(rows, pk)
     return redirect('fakecsv:data_sets_list', pk=pk)
+
+
+# Helper function for ajax
+def check_task_status(request, task_id):
+    task_status = TaskResult.objects.filter(task_id=task_id)[0].status
+    data = {'status': task_status}
+    return JsonResponse(data)
 
 
 def download_csv(request, pk=None, id=None):
@@ -62,17 +61,6 @@ def download_csv(request, pk=None, id=None):
 
     response = FileResponse(open(csv_file, 'rb'))
     return response
-
-
-# def export_csv(request, pk=None):
-#     response = HttpResponse(content_type='text/csv')
-#         data_schema = 'Customers'
-#         response['Content-Disposition'] = f'attachment; filename="{data_schema}_{pk if pk else ""}.csv"'
-#
-#         columns = Column.objects.select_related().filter(data_schema__name=data_schema)
-#         csv_writer = CsvWriter(response, columns)
-#         csv_writer.run()
-#         return response
 
 
 class DataSchemasListView(LoginRequiredMixin, ListView):
@@ -150,16 +138,10 @@ class DataSchemaUpdateView(UpdateView):
         return super(DataSchemaUpdateView, self).form_valid(form)
 
 
-# class DataSetsDetailView(LoginRequiredMixin, DetailView):
-#     login_url = '/accounts/login'
-#     queryset = DataSet.objects.filter(data_schema=self.request.pk)
-#     template_name = 'fakecsv/data_sets_list.html'
-
-
 def data_sets_view(request, pk=None):
     form = DataSetForm()
-    object_list = DataSet.objects.filter(data_schema=pk)
-    data_schema = DataSchema.objects.filter(id=pk).first()
+    object_list = DataSet.objects.select_related().filter(data_schema=pk)
+    data_schema = DataSchema.objects.select_related().filter(id=pk).first()
     return render(request, 'fakecsv/data_sets_list.html',
                   context={'object_list': object_list,
                            'data_schema': data_schema,
