@@ -43,5 +43,4 @@ class ProdConf(BaseConf):
     REDIS_USER = os.environ.get("REDIS_USER")
     REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD")
     CELERY_BROKER_URL = os.environ.get("BROKER_URL")
-    CELERY_BROKER_TRANSPORT_OPTIONS = os.environ.get("BROKER_TRANSPORT_OPTIONS")
     CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND")
