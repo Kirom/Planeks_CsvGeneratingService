@@ -1,4 +1,5 @@
 import boto3
+import requests
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -45,19 +46,20 @@ def generate_csv(request, pk=None):
         if form.is_valid():
             data = form.cleaned_data
             rows = data['rows']
+            print(rows)
     else:
         messages.error(request, message='Please input rows quantity')
         form = DataSetForm()
-    # data_schema = DataSchema.objects.filter(id=pk).first()
-    # new_data_set = DataSet.objects.create(created=timezone.now(),
-    #                                       status='Processing',
-    #                                       data_schema=data_schema)
-    # csv_file = os.path.join(MEDIA_ROOT, f'{data_schema}_{new_data_set.id}.csv')
-    # columns = Column.objects.select_related().filter(data_schema__name=data_schema)
-    # csv_writer = CsvWriter(csv_file, columns, rows)
-    # csv_writer.run()
-    # DataSet.objects.filter(id=new_data_set.id).update(status='Ready')
-    generate_csv_task.delay(rows, pk)
+    data_schema = DataSchema.objects.filter(id=pk).first()
+    new_data_set = DataSet.objects.create(created=timezone.now(),
+                                          status='Processing',
+                                          data_schema=data_schema)
+    csv_file = os.path.join(MEDIA_ROOT, f'{data_schema}_{new_data_set.id}.csv')
+    columns = Column.objects.select_related().filter(data_schema__name=data_schema)
+    csv_writer = CsvWriter(csv_file, columns, rows)
+    csv_writer.run()
+    DataSet.objects.filter(id=new_data_set.id).update(status='Ready')
+    # generate_csv_task.delay(rows, pk)
     return redirect('fakecsv:data_sets_list', pk=pk)
 
 
@@ -71,14 +73,19 @@ def check_task_status(request, task_id):
 def download_csv(request, pk=None, id=None):
     data_schema = DataSchema.objects.filter(id=pk).first()
     csv_file = os.path.join(MEDIA_ROOT, f'{data_schema}_{id}.csv')
-    s3_client = boto3.client(aws_access_key_id=AWS_ACCESS_KEY_ID,
-                             aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-                             service_name='s3')
-    downloaded_csv = f'{data_schema}_{id}.csv'
-    s3_client.download_file(S3_BUCKET_NAME, csv_file, downloaded_csv)
-
+    # s3_client = boto3.client(aws_access_key_id=AWS_ACCESS_KEY_ID,
+    #                          aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
+    #                          service_name='s3')
+    # s3_client.download_file(S3_BUCKET_NAME, csv_file, downloaded_csv)
+    # r = requests.get(f'https://fakecsvdev.s3.eu-central-1.amazonaws.com/{csv_file}')
+    # return redirect(f'https://fakecsvdev.s3.eu-central-1.amazonaws.com/{csv_file}')
+    # with open('response.csv', 'w') as csv:
+    #     csv.write(r.text)
+    #     return FileResponse(csv)
     response = FileResponse(open(csv_file, 'rb'))
+
     return response
+    # return HttpResponse('lol')
 
 
 class DataSchemasListView(LoginRequiredMixin, ListView):
