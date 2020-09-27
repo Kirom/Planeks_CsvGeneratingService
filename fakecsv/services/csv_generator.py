@@ -109,5 +109,3 @@ class CsvWriter:
         with open(self.file_name, 'w') as csv_file:
             self.get_init_vals(csv_file)
             self.write_rows()
-        print(f'Проверка на существование файла {self.file_name}:'
-              f' {os.path.isfile(self.file_name)} ')

@@ -22,4 +22,6 @@ def generate_csv_task(self, rows, pk):
     csv_writer = CsvWriter(csv_file, columns, rows)
     csv_writer.run()
     DataSet.objects.filter(id=new_data_set.id).update(status='Ready')
+    print(f'Проверка на существование файла {csv_file}:'
+          f' {os.path.isfile(csv_file)} ')
     return 'Ready'
