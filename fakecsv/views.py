@@ -1,3 +1,4 @@
+import boto3
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -69,10 +70,11 @@ def check_task_status(request, task_id):
 def download_csv(request, pk=None, id=None):
     data_schema = DataSchema.objects.filter(id=pk).first()
     csv_file = os.path.join(MEDIA_ROOT, f'{data_schema}_{id}.csv')
+    s3_client = boto3.client('s3')
+    downloaded_csv = f'{data_schema}_{id}.csv'
+    s3_client.download_file('fakecsv', csv_file, downloaded_csv)
 
     response = FileResponse(open(csv_file, 'rb'))
-    print(f'Проверка на существование файла {csv_file}:'
-          f' {os.path.isfile(csv_file)} ')
     return response
 
 
