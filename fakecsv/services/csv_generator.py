@@ -1,4 +1,5 @@
 import csv
+import os
 import random
 from random import choice
 from string import ascii_uppercase, ascii_lowercase
@@ -108,4 +109,5 @@ class CsvWriter:
         with open(self.file_name, 'w') as csv_file:
             self.get_init_vals(csv_file)
             self.write_rows()
-
+        print(f'Проверка на существование файла {self.file_name}:'
+              f' {os.path.isfile(self.file_name)} ')
