@@ -13,7 +13,7 @@ from django_celery_results.models import TaskResult
 
 from fakecsv.services.csv_generator import CsvWriter
 from fakecsv.tasks import generate_csv_task
-from Planeks_CsvGeneratingService.settings import BASE_DIR, MEDIA_ROOT, S3_BUCKET, AWS_ACCESS_KEY_ID, \
+from Planeks_CsvGeneratingService.settings import BASE_DIR, MEDIA_ROOT, S3_BUCKET_NAME, AWS_ACCESS_KEY_ID, \
     AWS_SECRET_ACCESS_KEY
 from fakecsv.forms import DataSchemaForm, ColumnFormSet, DataSetForm
 from fakecsv.models import DataSchema, DataSet, Column
