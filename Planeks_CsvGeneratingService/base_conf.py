@@ -29,7 +29,6 @@ class BaseConf(Configuration):
         'django.contrib.messages',
         'django.contrib.staticfiles',
         'crispy_forms',
-        'django_celery_results',
         'dynamic_formsets',
         'accounts',
         'fakecsv',
