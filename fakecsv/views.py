@@ -48,16 +48,16 @@ def generate_csv(request, pk=None):
     else:
         messages.error(request, message='Please input rows quantity')
         form = DataSetForm()
-    # data_schema = DataSchema.objects.filter(id=pk).first()
-    # new_data_set = DataSet.objects.create(created=timezone.now(),
-    #                                       status='Processing',
-    #                                       data_schema=data_schema)
-    # csv_file = os.path.join(MEDIA_ROOT, f'{data_schema}_{new_data_set.id}.csv')
-    # columns = Column.objects.select_related().filter(data_schema__name=data_schema)
-    # csv_writer = CsvWriter(csv_file, columns, rows)
-    # csv_writer.run()
-    # DataSet.objects.filter(id=new_data_set.id).update(status='Ready')
-    generate_csv_task.delay(rows, pk)
+    data_schema = DataSchema.objects.filter(id=pk).first()
+    new_data_set = DataSet.objects.create(created=timezone.now(),
+                                          status='Processing',
+                                          data_schema=data_schema)
+    csv_file = os.path.join(MEDIA_ROOT, f'{data_schema}_{new_data_set.id}.csv')
+    columns = Column.objects.select_related().filter(data_schema__name=data_schema)
+    csv_writer = CsvWriter(csv_file, columns, rows)
+    csv_writer.run()
+    DataSet.objects.filter(id=new_data_set.id).update(status='Ready')
+    # generate_csv_task.delay(rows, pk)
     return redirect('fakecsv:data_sets_list', pk=pk)
 
 
