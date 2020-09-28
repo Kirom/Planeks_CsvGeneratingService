@@ -1,35 +1,36 @@
 import csv
+
 import logging
-import os
+
 import random
-from random import choice
+
 from string import ascii_uppercase, ascii_lowercase
-
-import boto3
-
-from Planeks_CsvGeneratingService.settings import S3_BUCKET_NAME, AWS_ACCESS_KEY_ID, \
-    AWS_SECRET_ACCESS_KEY
 
 
 def _generate_full_name():
-    name = ''.join(choice(ascii_uppercase)) + ''.join(
-        choice(ascii_lowercase) for i in range(random.randint(3, 8)))
-    surname = ''.join(choice(ascii_uppercase)) + ''.join(
-        choice(ascii_lowercase) for i in range(random.randint(3, 12)))
+    """Generates full name with absolutely random letters."""
+    name = ''.join(random.choice(ascii_uppercase)) + ''.join(
+        random.choice(ascii_lowercase) for i in range(random.randint(3, 8)))
+    surname = ''.join(random.choice(ascii_uppercase)) + ''.join(
+        random.choice(ascii_lowercase) for i in range(random.randint(3, 12)))
     return f'{name} {surname}'
 
 
 def _generate_company_name():
+    """Generates company name with absolutely random letters
+    and 'Inc.' at the end."""
     company_name = ''
     for i in range(random.randint(1, 4)):
-        random_word = ''.join(choice(ascii_uppercase)) + ''.join(
-            choice(ascii_lowercase) for i in range(random.randint(3, 15)))
+        random_word = ''.join(random.choice(ascii_uppercase)) + ''.join(
+            random.choice(ascii_lowercase) for i in range(
+                random.randint(3, 15)))
         company_name += f'{random_word} '
     company_name += 'Inc.'
     return company_name
 
 
 def _generate_date():
+    """Generates date with random numbers."""
     month = random.randint(1, 12)
     day = random.randint(1, 31)
     date = f'20{random.randint(10, 20)}-' \
@@ -92,17 +93,19 @@ class CsvWriter:
                     full_name = _generate_full_name()
                     row[column.name] = full_name
                 elif column.data_type == 'INT':
-                    result_integer = random.randint(column.range_from, column.range_to)
+                    result_integer = random.randint(column.range_from,
+                                                    column.range_to)
                     row[column.name] = result_integer
                 elif column.data_type == 'CN':
                     company_name = _generate_company_name()
                     row[column.name] = company_name
                 elif column.data_type == 'JOB':
-                    job = choice(JOBS_LIST)
+                    job = random.choice(JOBS_LIST)
                     row[column.name] = job
                 elif column.data_type == 'EMAIL':
                     email = ''.join(
-                        choice(ascii_lowercase) for i in range(random.randint(3, 12))) + '@' + choice(
+                        random.choice(ascii_lowercase) for i in range(
+                            random.randint(3, 12))) + '@' + random.choice(
                         EMAIL_DOMAINS_LIST)
                     row[column.name] = email
                 elif column.data_type == 'DATE':
@@ -112,13 +115,8 @@ class CsvWriter:
             self.writer.writerow(row)
 
     def run(self):
+        """Runs writer."""
         with open(self.file_name, 'w') as csv_file:
             self.get_init_vals(csv_file)
             self.write_rows()
             logging.warning('Processing file')
-            # s3_client = boto3.client(aws_access_key_id=AWS_ACCESS_KEY_ID,
-            #                          aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-            #                          service_name='s3')
-            # s3_client.upload_file(csv_file.name, S3_BUCKET_NAME, csv_file.name)
-        with open(self.file_name, 'r') as csv_file:
-            print(csv_file.read())

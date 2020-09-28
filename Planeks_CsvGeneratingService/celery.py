@@ -5,7 +5,8 @@ import os
 
 from celery import Celery
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "Planeks_CsvGeneratingService.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE",
+                      "Planeks_CsvGeneratingService.settings")
 os.environ.setdefault("DJANGO_CONFIGURATION", "LocalConf")
 import configurations  # noqa
 

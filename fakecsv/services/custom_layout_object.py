@@ -1,9 +1,10 @@
 from crispy_forms.layout import LayoutObject, TEMPLATE_PACK
-from django.shortcuts import render
+
 from django.template.loader import render_to_string
 
 
 class Formset(LayoutObject):
+    """Define formset's layout."""
     template = "fakecsv/formset.html"
 
     def __init__(self, formset_name_in_context, template=None):

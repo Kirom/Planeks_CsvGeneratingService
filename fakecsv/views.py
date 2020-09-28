@@ -1,25 +1,23 @@
-import boto3
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db import transaction
-from django.http import HttpResponse, FileResponse
+from django.http import FileResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.generic import ListView
 from django.views.generic.edit import DeleteView, CreateView, UpdateView
+
 from django_celery_results.models import TaskResult
 
-from fakecsv.services.csv_generator import CsvWriter
-from fakecsv.tasks import generate_csv_task
-from Planeks_CsvGeneratingService.settings import BASE_DIR, MEDIA_ROOT, S3_BUCKET_NAME, AWS_ACCESS_KEY_ID, \
-    AWS_SECRET_ACCESS_KEY
 from fakecsv.forms import DataSchemaForm, ColumnFormSet, DataSetForm
 from fakecsv.models import DataSchema, DataSet, Column
+from fakecsv.services.csv_generator import CsvWriter
 
 import os
-from django.http import JsonResponse
+
+from Planeks_CsvGeneratingService.settings import MEDIA_ROOT
 
 
 # Неоконченный вариант с JS
@@ -53,7 +51,8 @@ def generate_csv(request, pk=None):
                                           status='Processing',
                                           data_schema=data_schema)
     csv_file = os.path.join(MEDIA_ROOT, f'{data_schema}_{new_data_set.id}.csv')
-    columns = Column.objects.select_related().filter(data_schema__name=data_schema)
+    columns = Column.objects.select_related().filter(
+        data_schema__name=data_schema)
     csv_writer = CsvWriter(csv_file, columns, rows)
     csv_writer.run()
     DataSet.objects.filter(id=new_data_set.id).update(status='Ready')
@@ -71,19 +70,8 @@ def check_task_status(request, task_id):
 def download_csv(request, pk=None, id=None):
     data_schema = DataSchema.objects.filter(id=pk).first()
     csv_file = os.path.join(MEDIA_ROOT, f'{data_schema}_{id}.csv')
-    # s3_client = boto3.client(aws_access_key_id=AWS_ACCESS_KEY_ID,
-    #                          aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-    #                          service_name='s3')
-    # s3_client.download_file(S3_BUCKET_NAME, csv_file, downloaded_csv)
-    # r = requests.get(f'https://fakecsvdev.s3.eu-central-1.amazonaws.com/{csv_file}')
-    # return redirect(f'https://fakecsvdev.s3.eu-central-1.amazonaws.com/{csv_file}')
-    # with open('response.csv', 'w') as csv:
-    #     csv.write(r.text)
-    #     return FileResponse(csv)
     response = FileResponse(open(csv_file, 'rb'))
-
     return response
-    # return HttpResponse('lol')
 
 
 class DataSchemasListView(LoginRequiredMixin, ListView):
@@ -92,7 +80,9 @@ class DataSchemasListView(LoginRequiredMixin, ListView):
     template_name = 'fakecsv/home.html'
 
 
-class DataSchemaDeleteView(SuccessMessageMixin, LoginRequiredMixin, DeleteView):
+class DataSchemaDeleteView(SuccessMessageMixin,
+                           LoginRequiredMixin,
+                           DeleteView):
     login_url = '/accounts/login'
     model = DataSchema
     template_name = 'fakecsv/delete.html'
@@ -102,10 +92,13 @@ class DataSchemaDeleteView(SuccessMessageMixin, LoginRequiredMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         obj = self.get_object()
         messages.success(self.request, self.success_message % obj.__dict__)
-        return super(DataSchemaDeleteView, self).delete(request, *args, **kwargs)
+        return super(DataSchemaDeleteView, self).delete(
+            request, *args, **kwargs)
 
 
-class DataSchemaCreateView(SuccessMessageMixin, LoginRequiredMixin, CreateView):
+class DataSchemaCreateView(SuccessMessageMixin,
+                           LoginRequiredMixin,
+                           CreateView):
     model = DataSchema
     login_url = '/accounts/login'
     form_class = DataSchemaForm
@@ -144,7 +137,8 @@ class DataSchemaUpdateView(UpdateView):
     def get_context_data(self, **kwargs):
         data = super(DataSchemaUpdateView, self).get_context_data(**kwargs)
         if self.request.POST:
-            data['columns'] = ColumnFormSet(self.request.POST, instance=self.object)
+            data['columns'] = ColumnFormSet(self.request.POST,
+                                            instance=self.object)
         else:
             data['columns'] = ColumnFormSet(instance=self.object)
         return data
