@@ -1,10 +1,11 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.files.storage import default_storage
 from django.db import transaction
 from django.http import FileResponse, JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views.generic import ListView
@@ -18,43 +19,34 @@ from fakecsv.models import DataSchema, DataSet
 from .tasks import generate_csv_task
 
 
-# Неоконченный вариант с JS
-# def generate_csv(request, pk=None):
-#     if request.method == 'POST':
-#         form = DataSetForm(request.POST or None)
-#         if form.is_valid():
-#             data = form.cleaned_data
-#             rows = data['rows']
-#     else:
-#         messages.error(request, message='Please input rows quantity')
-#         form = DataSetForm()
-#     task = generate_csv_task.delay(rows, pk)
-#     data = {'task_id': task.task_id, }
-#     response = JsonResponse(data)
-#     return redirect('fakecsv:data_sets_list', pk=pk,)
-
-
-# Рабочий вариант базовый без js
+@login_required
 def generate_csv(request, pk=None):
     if request.method == 'POST':
-        form = DataSetForm(request.POST or None)
-        if form.is_valid():
-            data = form.cleaned_data
-            rows = data['rows']
+        rows = int(request.POST.get('rows'))
+        response_data = {}
+        data_schema = DataSchema.objects.filter(id=pk).first()
+        new_data_set = DataSet.objects.create(created=timezone.now(),
+                                              status='Processing',
+                                              data_schema=data_schema)
+        task = generate_csv_task.delay(rows, data_schema.name, new_data_set.id)
+        response_data['result'] = 'Successful'
+        response_data['task_id'] = task.task_id
+        response_data['csv_file_id'] = new_data_set.id
+        created = new_data_set.created
+        response_data['created'] = created
+        return JsonResponse(response_data, status=200)
     else:
-        messages.error(request, message='Please input rows quantity')
-        form = DataSetForm()
-    generate_csv_task.delay(rows, pk)
-    return redirect('fakecsv:data_sets_list', pk=pk)
+        return JsonResponse({'result': 'Failed! =('}, status=400)
 
 
-# Helper function for ajax
 def check_task_status(request, task_id):
-    task_status = TaskResult.objects.filter(task_id=task_id)[0].status
-    data = {'status': task_status}
+    """Helper function for ajax."""
+    task_result = TaskResult.objects.filter(task_id=task_id)[0].result
+    data = {'result': task_result}
     return JsonResponse(data)
 
 
+@login_required
 def download_csv(request, pk=None, id=None):
     data_schema = DataSchema.objects.filter(id=pk).first()
     csv_file = f'{data_schema}_{id}.csv'
@@ -114,7 +106,7 @@ class DataSchemaCreateView(SuccessMessageMixin,
         return super(DataSchemaCreateView, self).form_valid(form)
 
 
-class DataSchemaUpdateView(UpdateView):
+class DataSchemaUpdateView(LoginRequiredMixin, UpdateView):
     model = DataSchema
     login_url = '/accounts/login'
     form_class = DataSchemaForm
@@ -143,6 +135,7 @@ class DataSchemaUpdateView(UpdateView):
         return super(DataSchemaUpdateView, self).form_valid(form)
 
 
+@login_required
 def data_sets_view(request, pk=None):
     form = DataSetForm()
     object_list = DataSet.objects.select_related().filter(data_schema=pk)

@@ -10,6 +10,7 @@
         </div>
 
         <div class="col-md-5">
+            {% csrf_token %}
             {% crispy form %}
             {{ form.errors }}
         </div>
@@ -52,6 +53,6 @@
         </div>
     </div>
 {% endblock %}
-{#{% block javascript %}#}
-{#    <script type="text/javascript"#}
-{#            src="{% static 'fakecsv/js/js.js' %}"></script>{% endblock %}#}
+{% block javascript %}
+    <script type="text/javascript"
+            src="{% static 'fakecsv/js/js.js' %}"></script>{% endblock %}

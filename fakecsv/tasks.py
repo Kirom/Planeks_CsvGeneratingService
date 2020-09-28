@@ -13,17 +13,12 @@ from .services.csv_generator import CsvWriter
 
 
 @app.task(bind=True)
-def generate_csv_task(self, rows, pk):
+def generate_csv_task(self, rows, data_schema, new_data_set_id):
     """Generate csv in background via celery."""
-    data_schema = DataSchema.objects.filter(id=pk).first()
-    new_data_set = DataSet.objects.create(created=timezone.now(),
-                                          status='Processing',
-                                          data_schema=data_schema)
-    # csv_file = os.path.join(MEDIA_ROOT, f'{data_schema}_{new_data_set.id}.csv')
-    csv_file = f'{data_schema}_{new_data_set.id}.csv'
+    csv_file = f'{data_schema}_{new_data_set_id}.csv'
     columns = Column.objects.select_related().filter(
         data_schema__name=data_schema)
     csv_writer = CsvWriter(csv_file, columns, rows)
     csv_writer.run()
-    DataSet.objects.filter(id=new_data_set.id).update(status='Ready')
+    DataSet.objects.filter(id=new_data_set_id).update(status='Ready')
     return 'Ready'
