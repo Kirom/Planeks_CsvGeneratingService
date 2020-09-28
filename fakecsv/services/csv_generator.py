@@ -6,6 +6,8 @@ import random
 
 from string import ascii_uppercase, ascii_lowercase
 
+from django.core.files.storage import default_storage
+
 
 def _generate_full_name():
     """Generates full name with absolutely random letters."""
@@ -116,7 +118,13 @@ class CsvWriter:
 
     def run(self):
         """Runs writer."""
-        with open(self.file_name, 'w') as csv_file:
+        # with open(self.file_name, 'w') as csv_file:
+        #     self.get_init_vals(csv_file)
+        #     self.write_rows()
+        #     logging.warning('Processing file')
+        with default_storage.open(self.file_name, 'w') as csv_file:
             self.get_init_vals(csv_file)
             self.write_rows()
-            logging.warning('Processing file')
+        # file = default_storage.open('storage_test', 'w')
+        # file.write('storage contents')
+        # file.close()

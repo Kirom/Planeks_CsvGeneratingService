@@ -106,3 +106,4 @@ class BaseConf(Configuration):
     MEDIA_URL = '/media/'
 
     CRISPY_TEMPLATE_PACK = "bootstrap4"
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
