@@ -106,13 +106,15 @@ class DataSchemaCreateView(SuccessMessageMixin,
         return super(DataSchemaCreateView, self).form_valid(form)
 
 
-class DataSchemaUpdateView(LoginRequiredMixin, UpdateView):
+class DataSchemaUpdateView(SuccessMessageMixin,
+                           LoginRequiredMixin,
+                           UpdateView):
     model = DataSchema
     login_url = '/accounts/login'
     form_class = DataSchemaForm
     template_name = 'fakecsv/create.html'
     success_url = reverse_lazy('fakecsv:data_schema_list')
-    success_message = 'Data schema created successfully!'
+    success_message = 'Data schema updated successfully!'
 
     def get_context_data(self, **kwargs):
         data = super(DataSchemaUpdateView, self).get_context_data(**kwargs)
