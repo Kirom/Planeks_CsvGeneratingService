@@ -21,6 +21,7 @@ from .tasks import generate_csv_task
 
 @login_required
 def generate_csv(request, pk=None):
+    """Generate csv via ajax."""
     if request.method == 'POST':
         rows = int(request.POST.get('rows'))
         response_data = {}
@@ -48,6 +49,7 @@ def check_task_status(request, task_id):
 
 @login_required
 def download_csv(request, pk=None, id=None):
+    """Download result csv file."""
     data_schema = DataSchema.objects.filter(id=pk).first()
     csv_file = f'{data_schema}_{id}.csv'
     response = FileResponse(default_storage.open(csv_file, 'rb'))
@@ -55,6 +57,7 @@ def download_csv(request, pk=None, id=None):
 
 
 class DataSchemasListView(LoginRequiredMixin, ListView):
+    """Data schema list."""
     login_url = '/accounts/login'
     queryset = DataSchema.objects.all()
     template_name = 'fakecsv/home.html'
@@ -63,6 +66,7 @@ class DataSchemasListView(LoginRequiredMixin, ListView):
 class DataSchemaDeleteView(SuccessMessageMixin,
                            LoginRequiredMixin,
                            DeleteView):
+    """Data schema delete view."""
     login_url = '/accounts/login'
     model = DataSchema
     template_name = 'fakecsv/delete.html'
@@ -79,6 +83,7 @@ class DataSchemaDeleteView(SuccessMessageMixin,
 class DataSchemaCreateView(SuccessMessageMixin,
                            LoginRequiredMixin,
                            CreateView):
+    """Data schema create view."""
     model = DataSchema
     login_url = '/accounts/login'
     form_class = DataSchemaForm
@@ -109,6 +114,7 @@ class DataSchemaCreateView(SuccessMessageMixin,
 class DataSchemaUpdateView(SuccessMessageMixin,
                            LoginRequiredMixin,
                            UpdateView):
+    """Data schema update view."""
     model = DataSchema
     login_url = '/accounts/login'
     form_class = DataSchemaForm
@@ -139,6 +145,7 @@ class DataSchemaUpdateView(SuccessMessageMixin,
 
 @login_required
 def data_sets_view(request, pk=None):
+    """Data sets list of specific data schema."""
     form = DataSetForm()
     object_list = DataSet.objects.select_related().filter(data_schema=pk)
     data_schema = DataSchema.objects.select_related().filter(id=pk).first()

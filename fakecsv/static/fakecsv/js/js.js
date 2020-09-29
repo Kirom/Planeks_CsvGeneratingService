@@ -1,12 +1,10 @@
 'use strict';
 
 function generate_csv() {
-    console.log("Generating csv!") // sanity check
     var rows = $('#rows-number').val()
     var data = {rows: rows}
     var csrf_token = $('[name="csrfmiddlewaretoken"]').val()
     data['csrfmiddlewaretoken'] = csrf_token
-    console.log(csrf_token)
     $.ajax({
         url: "generate_csv/",
         dataType: 'json',
@@ -27,9 +25,7 @@ function generate_csv() {
                 <td class="new_row-${data['new_row_number']}"></td>
                 </tr>
                 `)
-            console.log("success");
         },
-
         error: () => {
             console.log('Error')
         },
@@ -43,8 +39,10 @@ function generate_csv() {
                         var new_action = $(`.new_row-${data['new_row_number']}`)
                         var new_status = $(`.new-status-${data['new_row_number']}`)
                         new_status[0].outerHTML = '<button class="btn btn-success">Ready</button>'
-                        console.log(new_status[0])
-                        new_action.append(`<a href="download_csv/${data['csv_file_id']}/"><button class="btn btn-primary">Download</button></a>`)
+                        new_action.append(
+                            `<a href="download_csv/${data['csv_file_id']}/">
+                                <button class="btn btn-primary">Download</button>
+                             </a>`)
                         if (data['task_result'] === '"Ready"') {
                             continuePolling = false;
                         }
@@ -57,13 +55,10 @@ function generate_csv() {
                 })
             }, 1000);
         }
-
-
     });
 }
 
 $('#generate-csv-form').on('submit', function (event) {
     event.preventDefault();
-    console.log("form submitted!")  // sanity check
     generate_csv();
 });
