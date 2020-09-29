@@ -7,7 +7,7 @@ If you have any questions, you can contact me in telegram @Nizhdanchik or email 
 
 Deployment link: `https://fakecsv.herokuapp.com/` or [click](https://fakecsv.herokuapp.com/).
 
-Authentication credentials: Username: First, Password: second123 
+Authentication credentials: Username: `First`, Password: `second123` 
 
 ## Running all the stuff step by step
 1. Clone repo: `git clone https://github.com/Kirom/Planeks_CsvGeneratingService.git`
