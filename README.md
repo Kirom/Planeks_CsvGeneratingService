@@ -1,8 +1,6 @@
 # Planeks_CsvGeneratingService
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-Python test assessment by Planeks.
-
 If you have any questions, you can contact me in telegram @Nizhdanchik or email me viktor.mironov.dev@gmail.com.
 
 Deployment link: `https://fakecsv.herokuapp.com/` or [click](https://fakecsv.herokuapp.com/).
